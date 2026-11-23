@@ -1,6 +1,8 @@
 import DashboardLayout from './components/layout/DashboardLayout'
 import SensorCard from './components/sensors/SensorCard'
 import SensorChart from './components/charts/SensorChart'
+import { useState } from 'react'
+import SetpointControl from './components/controls/SetpointControl'
 
 import {
   temperatureData,
@@ -9,6 +11,9 @@ import {
 } from './services/mockData.ts'
 
 function App() {
+  const [temperatureSetpoint, setTemperatureSetpoint] = useState<number | null>(null)
+  const [phSetpoint, setPhSetpoint] = useState<number | null>(null)
+  const [stirringSetpoint, setStirringSetpoint] = useState<number | null>(null)
   return (
     <DashboardLayout>
       <h2 className="text-2xl font-semibold text-white">
@@ -65,6 +70,43 @@ function App() {
           colour="#34d399"
           unit="RPM"
         />
+      </div>
+
+      {/* Setpoint controls */}
+      <div className="mt-10">
+        <h2 className="text-2xl font-semibold text-white">
+          Setpoint Controls
+        </h2>
+
+        <p className="mt-2 text-gray-400">
+          Adjust the desired operating parameters.
+        </p>
+
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <SetpointControl
+            title="Temperature"
+            unit="°C"
+            confirmedValue={37.0}
+            requestedValue={temperatureSetpoint}
+            onSubmit={setTemperatureSetpoint}
+          />
+
+          <SetpointControl
+            title="pH"
+            unit="pH"
+            confirmedValue={7.0}
+            requestedValue={phSetpoint}
+            onSubmit={setPhSetpoint}
+          />
+
+          <SetpointControl
+            title="Stirring Speed"
+            unit="RPM"
+            confirmedValue={150}
+            requestedValue={stirringSetpoint}
+            onSubmit={setStirringSetpoint}
+          />
+        </div>
       </div>
     </DashboardLayout>
   )
