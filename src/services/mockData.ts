@@ -1,32 +1,46 @@
-export const temperatureData = [
-  { timestamp: '12:00', value: 36.8 },
-  { timestamp: '12:05', value: 36.9 },
-  { timestamp: '12:10', value: 37.0 },
-  { timestamp: '12:15', value: 37.1 },
-  { timestamp: '12:20', value: 37.0 },
-  { timestamp: '12:25', value: 37.2 },
-  { timestamp: '12:30', value: 37.2 },
-  { timestamp: '12:35', value: 37.3 },
-]
+import type { SensorPacket } from '../types/bioreactor'
 
-export const phData = [
-  { timestamp: '12:00', value: 7.0 },
-  { timestamp: '12:05', value: 7.1 },
-  { timestamp: '12:10', value: 7.0 },
-  { timestamp: '12:15', value: 7.2 },
-  { timestamp: '12:20', value: 7.1 },
-  { timestamp: '12:25', value: 7.1 },
-  { timestamp: '12:30', value: 7.2 },
-  { timestamp: '12:35', value: 7.1 },
-]
-
-export const stirringData = [
-  { timestamp: '12:00', value: 145 },
-  { timestamp: '12:05', value: 148 },
-  { timestamp: '12:10', value: 150 },
-  { timestamp: '12:15', value: 150 },
-  { timestamp: '12:20', value: 152 },
-  { timestamp: '12:25', value: 150 },
-  { timestamp: '12:30', value: 149 },
-  { timestamp: '12:35', value: 150 },
+export const sensorPackets: SensorPacket[] = [
+  {
+    timestamp: '2026-11-23T14:30:00Z',
+    ph: 7.0,
+    temperature: 36.8,
+    stirringSpeed: 145,
+  },
+  {
+    timestamp: '2026-11-23T14:35:00Z',
+    ph: 7.1,
+    temperature: 36.9,
+    stirringSpeed: 148,
+  },
+  {
+    timestamp: '2026-11-23T14:40:00Z',
+    ph: 7.1,
+    temperature: 37.0,
+    stirringSpeed: 150,
+  },
+  {
+    timestamp: '2026-11-23T14:45:00Z',
+    ph: 7.2,
+    temperature: 37.1,
+    stirringSpeed: 152,
+  },
+  {
+    timestamp: '2026-11-23T14:50:00Z',
+    ph: 7.1,
+    temperature: 37.2,
+    stirringSpeed: 150,
+  },
+  {
+    timestamp: '2026-11-23T14:55:00Z',
+    ph: 7.1,
+    temperature: 37.2,
+    stirringSpeed: 151,
+  },
+  {
+    timestamp: '2026-11-23T15:00:00Z',
+    ph: 7.1,
+    temperature: 37.2,
+    stirringSpeed: 150,
+  },
 ]
