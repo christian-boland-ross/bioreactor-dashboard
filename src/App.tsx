@@ -2,9 +2,10 @@ import { useState } from 'react'
 
 import DashboardLayout from './components/layout/DashboardLayout'
 import MetricPanel from './components/layout/MetricPanel'
-import { sensorPackets } from './services/mockData'
+import useSensorData from './hooks/useSensorData'
 
 function App() {
+  const { packets, latestPacket } = useSensorData()
   const [temperatureSetpoint, setTemperatureSetpoint] = useState<number | null>(null)
   const [phSetpoint, setPhSetpoint] = useState<number | null>(null)
   const [stirringSetpoint, setStirringSetpoint] = useState<number | null>(null)
@@ -22,12 +23,12 @@ function App() {
       <div className="mt-8 space-y-8">
         <MetricPanel
           title="Temperature"
-          value={37.2}
+          value={latestPacket.temperature}
           unit="°C"
           status="normal"
           confirmedSetpoint={37.0}
           requestedSetpoint={temperatureSetpoint}
-          data={sensorPackets}
+          data={packets}
           metric="temperature"
           colour="#38bdf8"
           onSubmit={setTemperatureSetpoint}
@@ -35,12 +36,12 @@ function App() {
 
         <MetricPanel
           title="pH"
-          value={7.1}
+          value={latestPacket.ph}
           unit="pH"
           status="warning"
           confirmedSetpoint={7.0}
           requestedSetpoint={phSetpoint}
-          data={sensorPackets}
+          data={packets}
           metric="ph"
           colour="#a78bfa"
           onSubmit={setPhSetpoint}
@@ -48,12 +49,12 @@ function App() {
 
         <MetricPanel
           title="Stirring Speed"
-          value={150}
+          value={latestPacket.stirringSpeed}
           unit="RPM"
           status="normal"
           confirmedSetpoint={150}
           requestedSetpoint={stirringSetpoint}
-          data={sensorPackets}
+          data={packets}
           metric="stirringSpeed"
           colour="#34d399"
           onSubmit={setStirringSetpoint}
