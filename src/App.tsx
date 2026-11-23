@@ -1,10 +1,16 @@
+import DashboardLayout from './components/layout/DashboardLayout'
+
 function App() {
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-      <h1 className="text-4xl font-bold text-white">
-        Bioreactor Dashboard
-      </h1>
-    </div>
+    <DashboardLayout>
+      <h2 className="text-2xl font-semibold text-white">
+        Overview
+      </h2>
+
+      <p className="mt-2 text-gray-400">
+        Bioreactor monitoring and control.
+      </p>
+    </DashboardLayout>
   )
 }
 
