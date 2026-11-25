@@ -1,14 +1,15 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 
 import type {
   SetpointRequest,
   SetpointRequestState,
 } from '../types/bioreactor'
 
+import { submitSetpointRequest } from '../services/bioreactorApi'
+
 type SetpointParameter = SetpointRequest['parameter']
 
 function useSetpoints() {
-  // The setpoints currently confirmed by the bioreactor
   const [confirmedSetpoints, setConfirmedSetpoints] = useState<
     Record<SetpointParameter, number>
   >({
@@ -17,7 +18,6 @@ function useSetpoints() {
     stirringSpeed: 150,
   })
 
-  // The latest request for each parameter
   const [requests, setRequests] = useState<
     Record<SetpointParameter, SetpointRequestState | null>
   >({
@@ -26,22 +26,13 @@ function useSetpoints() {
     stirringSpeed: null,
   })
 
-  // Keep track of active response timers
-  const timers = useRef<
-    Partial<Record<SetpointParameter, ReturnType<typeof setTimeout>>>
-  >({})
-
-  // Submit a new setpoint request
-  function submitSetpoint(parameter: SetpointParameter, value: number) {
+  async function submitSetpoint(parameter: SetpointParameter, value: number) {
     if (!Number.isFinite(value)) return
 
     if (requests[parameter]?.status === 'pending') return
 
     const newRequest: SetpointRequestState = {
-      request: {
-        parameter,
-        value,
-      },
+      request: { parameter, value },
       status: 'pending',
     }
 
@@ -49,66 +40,48 @@ function useSetpoints() {
       ...previous,
       [parameter]: newRequest,
     }))
-  }
 
-  // Simulate backend responses
-  useEffect(() => {
-    const parameters: SetpointParameter[] = [
-      'temperature',
-      'ph',
-      'stirringSpeed',
-    ]
+    try {
+      const response = await submitSetpointRequest(newRequest.request)
 
-    parameters.forEach((parameter) => {
-      const request = requests[parameter]
-
-      if (request?.status === 'pending' && !timers.current[parameter]) {
-        const requestedValue = request.request.value
-
-        timers.current[parameter] = setTimeout(() => {
-          const accepted = Math.random() < 0.8
-
-          if (accepted) {
-            setConfirmedSetpoints((previous) => ({
-              ...previous,
-              [parameter]: requestedValue,
-            }))
-          }
-
-          setRequests((previous) => {
-            const currentRequest = previous[parameter]
-
-            if (
-              !currentRequest ||
-              currentRequest.status !== 'pending' ||
-              currentRequest.request.value !== requestedValue
-            ) {
-              return previous
-            }
-
-            return {
-              ...previous,
-              [parameter]: {
-                ...currentRequest,
-                status: accepted ? 'accepted' : 'rejected',
-              },
-            }
-          })
-
-          delete timers.current[parameter]
-        }, 1500)
+      if (response.accepted) {
+        setConfirmedSetpoints((previous) => ({
+          ...previous,
+          [parameter]: value,
+        }))
       }
-    })
-  }, [requests])
 
-  // Clean up timers if the hook is unmounted
-  useEffect(() => {
-    return () => {
-      Object.values(timers.current).forEach((timer) => {
-        if (timer) clearTimeout(timer)
+      setRequests((previous) => {
+        const currentRequest = previous[parameter]
+
+        if (
+          !currentRequest ||
+          currentRequest.status !== 'pending' ||
+          currentRequest.request.value !== value
+        ) {
+          return previous
+        }
+
+        return {
+          ...previous,
+          [parameter]: {
+            ...currentRequest,
+            status: response.accepted ? 'accepted' : 'rejected',
+          },
+        }
       })
+    } catch (error) {
+      console.error('Setpoint request failed:', error)
+
+      setRequests((previous) => ({
+        ...previous,
+        [parameter]: {
+          ...newRequest,
+          status: 'rejected',
+        },
+      }))
     }
-  }, [])
+  }
 
   return {
     confirmedSetpoints,
