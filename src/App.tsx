@@ -1,8 +1,8 @@
-import useSetpoints from './hooks/useSetpoints'
-
 import DashboardLayout from './components/layout/DashboardLayout'
 import MetricPanel from './components/layout/MetricPanel'
 import useSensorData from './hooks/useSensorData'
+import useSetpoints from './hooks/useSetpoints'
+import useConnectionStatus from './hooks/useConnectionStatus'
 
 function App() {
   const { packets, latestPacket } = useSensorData()
@@ -11,9 +11,12 @@ function App() {
     requests,
     submitSetpoint,
   } = useSetpoints()
-
+  const connection = useConnectionStatus(
+  latestPacket?.timestamp ?? null
+  )
+  
   return (
-    <DashboardLayout>
+    <DashboardLayout connection={connection}>
       <h2 className="text-2xl font-semibold text-white">
         Bioreactor Overview
       </h2>

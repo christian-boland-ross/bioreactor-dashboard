@@ -1,15 +1,18 @@
+import type { ReactNode } from 'react'
+
 import Header from './Header'
 
 interface DashboardLayoutProps {
-  children: React.ReactNode
+  children: ReactNode
+  connection: 'connected' | 'disconnected' | 'connecting'
 }
 
-function DashboardLayout({ children }: DashboardLayoutProps) {
+function DashboardLayout({ children, connection }: DashboardLayoutProps) {
   return (
-    <div className="min-h-screen bg-gray-900">
-      <Header />
+    <div className="min-h-screen bg-gray-900 text-white">
+      <Header connection={connection} />
 
-      <main className="mx-auto max-w-7xl p-8">
+      <main className="px-8 py-8">
         {children}
       </main>
     </div>
