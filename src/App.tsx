@@ -29,11 +29,8 @@ function App() {
           unit="°C"
           status="normal"
           confirmedSetpoint={confirmedSetpoints.temperature}
-          requestedSetpoint={
-            requests.temperature?.status === 'pending'
-              ? requests.temperature.request.value
-              : null
-          }
+          requestedSetpoint={requests.temperature?.request.value ?? null}
+          requestStatus={requests.temperature?.status ?? null}
           data={packets}
           metric="temperature"
           colour="#38bdf8"
@@ -46,11 +43,8 @@ function App() {
           unit="pH"
           status="warning"
           confirmedSetpoint={confirmedSetpoints.ph}
-          requestedSetpoint={
-            requests.ph?.status === 'pending'
-              ? requests.ph.request.value
-              : null
-          }
+          requestedSetpoint={requests.ph?.request.value ?? null}
+          requestStatus={requests.ph?.status ?? null}
           data={packets}
           metric="ph"
           colour="#a78bfa"
@@ -63,11 +57,8 @@ function App() {
           unit="RPM"
           status="normal"
           confirmedSetpoint={confirmedSetpoints.stirringSpeed}
-          requestedSetpoint={
-            requests.stirringSpeed?.status === 'pending'
-              ? requests.stirringSpeed.request.value
-              : null
-          }
+          requestedSetpoint={requests.stirringSpeed?.request.value ?? null}
+          requestStatus={requests.stirringSpeed?.status ?? null}
           data={packets}
           metric="stirringSpeed"
           colour="#34d399"

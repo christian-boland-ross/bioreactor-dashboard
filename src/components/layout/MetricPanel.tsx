@@ -18,6 +18,7 @@ interface MetricPanelProps {
   status: 'normal' | 'warning' | 'critical'
   confirmedSetpoint: number
   requestedSetpoint: number | null
+  requestStatus: 'pending' | 'accepted' | 'rejected' | null
   data: SensorPacket[]
   metric: 'temperature' | 'ph' | 'stirringSpeed'
   colour: string
@@ -31,6 +32,7 @@ function MetricPanel({
   status,
   confirmedSetpoint,
   requestedSetpoint,
+  requestStatus,
   data,
   metric,
   colour,
@@ -118,11 +120,33 @@ function MetricPanel({
         </button>
         </form>
 
-        {requestedSetpoint !== null && (
-        <p className="mt-2 text-sm text-yellow-400">
-            Requested: {requestedSetpoint} {unit} — awaiting confirmation
-        </p>
-        )}
+        {requestedSetpoint !== null && requestStatus !== null && (
+        <div className={`mt-3 text-sm ${
+          requestStatus === 'pending'
+            ? 'text-[#9A741D]'
+            : requestStatus === 'accepted'
+              ? 'text-green-700'
+              : 'text-red-700'
+        }`}>
+          {requestStatus === 'pending' && (
+            <p>
+              Awaiting confirmation: {requestedSetpoint} {unit}
+            </p>
+          )}
+
+          {requestStatus === 'accepted' && (
+            <p>
+              Request accepted. New setpoint: {requestedSetpoint} {unit}
+            </p>
+          )}
+
+          {requestStatus === 'rejected' && (
+            <p>
+              Request failed. Confirmed setpoint remains {confirmedSetpoint} {unit}.
+            </p>
+          )}
+        </div>
+      )}
     </div>
 
     </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import type {
   SetpointRequest,
@@ -26,14 +26,16 @@ function useSetpoints() {
     stirringSpeed: null,
   })
 
+  // Keep track of active response timers
+  const timers = useRef<
+    Partial<Record<SetpointParameter, ReturnType<typeof setTimeout>>>
+  >({})
+
   // Submit a new setpoint request
   function submitSetpoint(parameter: SetpointParameter, value: number) {
     if (!Number.isFinite(value)) return
 
-    const existingRequest = requests[parameter]
-
-    // Prevent another request while one is pending
-    if (existingRequest?.status === 'pending') return
+    if (requests[parameter]?.status === 'pending') return
 
     const newRequest: SetpointRequestState = {
       request: {
@@ -49,33 +51,69 @@ function useSetpoints() {
     }))
   }
 
-  // Simulate the backend accepting or rejecting a request
-  function resolveRequest(parameter: SetpointParameter, accepted: boolean) {
-    const existingRequest = requests[parameter]
+  // Simulate backend responses
+  useEffect(() => {
+    const parameters: SetpointParameter[] = [
+      'temperature',
+      'ph',
+      'stirringSpeed',
+    ]
 
-    if (!existingRequest || existingRequest.status !== 'pending') return
+    parameters.forEach((parameter) => {
+      const request = requests[parameter]
 
-    if (accepted) {
-      setConfirmedSetpoints((previous) => ({
-        ...previous,
-        [parameter]: existingRequest.request.value,
-      }))
+      if (request?.status === 'pending' && !timers.current[parameter]) {
+        const requestedValue = request.request.value
+
+        timers.current[parameter] = setTimeout(() => {
+          const accepted = Math.random() < 0.8
+
+          if (accepted) {
+            setConfirmedSetpoints((previous) => ({
+              ...previous,
+              [parameter]: requestedValue,
+            }))
+          }
+
+          setRequests((previous) => {
+            const currentRequest = previous[parameter]
+
+            if (
+              !currentRequest ||
+              currentRequest.status !== 'pending' ||
+              currentRequest.request.value !== requestedValue
+            ) {
+              return previous
+            }
+
+            return {
+              ...previous,
+              [parameter]: {
+                ...currentRequest,
+                status: accepted ? 'accepted' : 'rejected',
+              },
+            }
+          })
+
+          delete timers.current[parameter]
+        }, 1500)
+      }
+    })
+  }, [requests])
+
+  // Clean up timers if the hook is unmounted
+  useEffect(() => {
+    return () => {
+      Object.values(timers.current).forEach((timer) => {
+        if (timer) clearTimeout(timer)
+      })
     }
-
-    setRequests((previous) => ({
-      ...previous,
-      [parameter]: {
-        ...existingRequest,
-        status: accepted ? 'accepted' : 'rejected',
-      },
-    }))
-  }
+  }, [])
 
   return {
     confirmedSetpoints,
     requests,
     submitSetpoint,
-    resolveRequest,
   }
 }
 
