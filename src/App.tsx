@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import useSetpoints from './hooks/useSetpoints'
 
 import DashboardLayout from './components/layout/DashboardLayout'
 import MetricPanel from './components/layout/MetricPanel'
@@ -6,9 +6,11 @@ import useSensorData from './hooks/useSensorData'
 
 function App() {
   const { packets, latestPacket } = useSensorData()
-  const [temperatureSetpoint, setTemperatureSetpoint] = useState<number | null>(null)
-  const [phSetpoint, setPhSetpoint] = useState<number | null>(null)
-  const [stirringSetpoint, setStirringSetpoint] = useState<number | null>(null)
+  const {
+    confirmedSetpoints,
+    requests,
+    submitSetpoint,
+  } = useSetpoints()
 
   return (
     <DashboardLayout>
@@ -26,12 +28,16 @@ function App() {
           value={latestPacket.temperature}
           unit="°C"
           status="normal"
-          confirmedSetpoint={37.0}
-          requestedSetpoint={temperatureSetpoint}
+          confirmedSetpoint={confirmedSetpoints.temperature}
+          requestedSetpoint={
+            requests.temperature?.status === 'pending'
+              ? requests.temperature.request.value
+              : null
+          }
           data={packets}
           metric="temperature"
           colour="#38bdf8"
-          onSubmit={setTemperatureSetpoint}
+          onSubmit={(value) => submitSetpoint('temperature', value)}
         />
 
         <MetricPanel
@@ -39,12 +45,16 @@ function App() {
           value={latestPacket.ph}
           unit="pH"
           status="warning"
-          confirmedSetpoint={7.0}
-          requestedSetpoint={phSetpoint}
+          confirmedSetpoint={confirmedSetpoints.ph}
+          requestedSetpoint={
+            requests.ph?.status === 'pending'
+              ? requests.ph.request.value
+              : null
+          }
           data={packets}
           metric="ph"
           colour="#a78bfa"
-          onSubmit={setPhSetpoint}
+          onSubmit={(value) => submitSetpoint('ph', value)}
         />
 
         <MetricPanel
@@ -52,12 +62,16 @@ function App() {
           value={latestPacket.stirringSpeed}
           unit="RPM"
           status="normal"
-          confirmedSetpoint={150}
-          requestedSetpoint={stirringSetpoint}
+          confirmedSetpoint={confirmedSetpoints.stirringSpeed}
+          requestedSetpoint={
+            requests.stirringSpeed?.status === 'pending'
+              ? requests.stirringSpeed.request.value
+              : null
+          }
           data={packets}
           metric="stirringSpeed"
           colour="#34d399"
-          onSubmit={setStirringSetpoint}
+          onSubmit={(value) => submitSetpoint('stirringSpeed', value)}
         />
       </div>
     </DashboardLayout>

@@ -34,3 +34,12 @@ export interface SetpointRequest {
   parameter: 'temperature' | 'ph' | 'stirringSpeed'
   value: number
 }
+
+// Possible states of a setpoint request
+export type SetpointRequestStatus = 'pending' | 'accepted' | 'rejected'
+
+// A setpoint request and its current status
+export interface SetpointRequestState {
+  request: SetpointRequest
+  status: SetpointRequestStatus
+}
